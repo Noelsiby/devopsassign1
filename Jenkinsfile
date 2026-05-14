@@ -1,23 +1,38 @@
 pipeline {
     agent any
 
+    environment {
+        BUCKET = 'noel-devops-deploy'
+    }
+
     stages {
 
         stage('Clone Repository') {
             steps {
-                echo 'Cloning GitHub Repository'
+                git branch: 'main', url: 'https://github.com/Noelsiby/devopsassign1.git'
             }
         }
 
-        stage('Build') {
+        stage('Create ZIP') {
             steps {
-                echo 'Building Application'
+                sh 'zip -r project.zip .'
             }
         }
 
-        stage('Deploy') {
+        stage('Upload to S3') {
             steps {
-                echo 'Deploying Application with AWS CodeDeploy'
+                sh 'aws s3 cp project.zip s3://$BUCKET/'
+            }
+        }
+
+        stage('Deploy with CodeDeploy') {
+            steps {
+                sh '''
+                aws deploy create-deployment \
+                --application-name noeldevopscodedeploy \
+                --deployment-group-name noelCodeDeployServiceRole \
+                --s3-location bucket=$BUCKET,key=project.zip,bundleType=zip
+                '''
             }
         }
     }
