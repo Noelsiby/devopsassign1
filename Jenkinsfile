@@ -30,7 +30,7 @@ pipeline {
                 sh '''
                 aws deploy create-deployment \
                 --application-name noeldevopscodedeploy \
-                --deployment-group-name noelCodeDeployServiceRole \
+                --deployment-group-name noel-devops-group \
                 --s3-location bucket=$BUCKET,key=project.zip,bundleType=zip
                 '''
             }
